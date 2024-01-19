@@ -2,6 +2,8 @@ package com.timer.task.domain;
 
 import java.time.LocalDateTime;
 
+import com.timer.task.dtos.TaskDTO;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -27,4 +29,12 @@ public class Task {
   private LocalDateTime createdAt;
   private LocalDateTime finishedAt;
   private LocalDateTime interruptedAt;
+
+  public Task(TaskDTO taskDTO) {
+    task = taskDTO.task();
+    secondsAmount = taskDTO.secondsAmount();
+    createdAt = taskDTO.createdAt();
+    finishedAt = taskDTO.finishedAt();
+    interruptedAt = taskDTO.interruptedAt();
+  }
 }
