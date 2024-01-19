@@ -9,5 +9,5 @@ public record TaskDTO(
   LocalDateTime finishedAt,
   LocalDateTime interruptedAt
 ) {
-  
+
 }
