@@ -1,9 +1,12 @@
 package com.timer.task.services;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.timer.task.domain.Task;
@@ -15,8 +18,21 @@ public class TaskService {
   @Autowired
   private TaskRepository repository;
 
-  public List<Task> list() {
-    return this.repository.findAll();
+  public Page<Task> list(Map<String, String> filter) {
+    String limitFilter = filter.get("_limit");
+    String taskFilter = filter.get("task_like");
+
+    Integer limit = (limitFilter != null) ? Integer.parseInt(limitFilter) : 5;
+
+    if (taskFilter != null) {
+      return this.repository.findByTaskContaining(
+        taskFilter,
+        PageRequest.of(0, limit, Sort.by(Sort.Direction.DESC, "id"))
+      );
+    }
+    return this.repository.findAll(
+      PageRequest.of(0, limit, Sort.by(Sort.Direction.DESC, "id"))
+    );
   }
 
   public Task save(Task task) {
