@@ -3,6 +3,7 @@ package com.timer.task.services;
 import java.time.LocalDateTime;
 import java.util.Map;
 
+import com.timer.task.dtos.UpdateTaskDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -10,7 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.timer.task.domain.Task;
-import com.timer.task.dtos.TaskDTO;
+import com.timer.task.dtos.CreateTaskDTO;
 import com.timer.task.repositories.TaskRepository;
 
 @Service
@@ -21,17 +22,19 @@ public class TaskService {
   public Page<Task> list(Map<String, String> filter) {
     String limitFilter = filter.get("_limit");
     String taskFilter = filter.get("task_like");
+    String pageFilter = filter.get("_page");
 
     Integer limit = (limitFilter != null) ? Integer.parseInt(limitFilter) : 5;
+    Integer page = (pageFilter != null) ? Integer.parseInt(pageFilter) : 0;
 
     if (taskFilter != null) {
       return this.repository.findByTaskContaining(
         taskFilter,
-        PageRequest.of(0, limit, Sort.by(Sort.Direction.DESC, "id"))
+        PageRequest.of(page, limit, Sort.by(Sort.Direction.DESC, "id"))
       );
     }
     return this.repository.findAll(
-      PageRequest.of(0, limit, Sort.by(Sort.Direction.DESC, "id"))
+      PageRequest.of(page, limit, Sort.by(Sort.Direction.DESC, "id"))
     );
   }
 
@@ -39,20 +42,21 @@ public class TaskService {
     return this.repository.save(task);
   }
 
-  public Task createTask(TaskDTO taskDTO) {
+  public Task createTask(CreateTaskDTO taskDTO) {
     Task task = new Task(taskDTO);
     return this.save(task);
   }
 
-  public Task update(TaskDTO taskDTO, Long id) {
+  public Task update(UpdateTaskDTO taskDTO, Long id) {
     Task task = this.repository.findById(id).orElseThrow();
 
-    task.setTask(taskDTO.task());
-    task.setSecondsAmount(taskDTO.secondsAmount());
-    task.setCreatedAt(taskDTO.createdAt());
-    task.setFinishedAt(taskDTO.finishedAt());
-    task.setInterruptedAt(taskDTO.interruptedAt());
+    if (taskDTO.task() != null) {
+      task.setTask(taskDTO.task());
+    }
 
+    if (taskDTO.secondsAmount() != null) {
+      task.setSecondsAmount(taskDTO.secondsAmount());
+    }
     
     return this.save(task);
   }

@@ -1,8 +1,9 @@
 package com.timer.task.controllers;
 
-import java.util.List;
 import java.util.Map;
 
+import com.timer.task.dtos.UpdateTaskDTO;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -18,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.timer.task.domain.Task;
-import com.timer.task.dtos.TaskDTO;
+import com.timer.task.dtos.CreateTaskDTO;
 import com.timer.task.services.TaskService;
 
 @RestController
@@ -29,19 +30,19 @@ public class TaskController {
   private TaskService service;
 
   @GetMapping
-  public ResponseEntity<Page<Task>> list(@RequestParam(required = false) Map<String, String> request) {    
+  public ResponseEntity<Page<Task>> list(@RequestParam(required = false) Map<String, String> request) {
     Page<Task> tasks = this.service.list(request);
     return new ResponseEntity<>(tasks, HttpStatus.OK);
   }
 
   @PostMapping
-  public ResponseEntity<Task> create(@RequestBody TaskDTO taskDTO) {
+  public ResponseEntity<Task> create(@RequestBody @Valid CreateTaskDTO taskDTO) {
     Task task = service.createTask(taskDTO);
     return new ResponseEntity<>(task, HttpStatus.CREATED);
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity<Task> update(@RequestBody TaskDTO taskDTO, @PathVariable Long id) {
+  public ResponseEntity<Task> update(@RequestBody @Valid UpdateTaskDTO taskDTO, @PathVariable Long id) {
     Task task = service.update(taskDTO, id);
     return ResponseEntity.ok().body(task);
   }
