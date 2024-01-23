@@ -6,6 +6,9 @@ import com.timer.task.dtos.UpdateTaskDTO;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -30,8 +33,11 @@ public class TaskController {
   private TaskService service;
 
   @GetMapping
-  public ResponseEntity<Page<Task>> list(@RequestParam(required = false) Map<String, String> request) {
-    Page<Task> tasks = this.service.list(request);
+  public ResponseEntity<Page<Task>> list(
+    @PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pagination,
+    @RequestParam(required = false) Map<String, String> request
+  ) {
+    Page<Task> tasks = this.service.list(pagination, request);
     return new ResponseEntity<>(tasks, HttpStatus.OK);
   }
 

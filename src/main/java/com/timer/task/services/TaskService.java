@@ -7,6 +7,7 @@ import com.timer.task.dtos.UpdateTaskDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -19,23 +20,14 @@ public class TaskService {
   @Autowired
   private TaskRepository repository;
 
-  public Page<Task> list(Map<String, String> filter) {
-    String limitFilter = filter.get("_limit");
+  public Page<Task> list(Pageable pagination, Map<String, String> filter) {
     String taskFilter = filter.get("task_like");
-    String pageFilter = filter.get("_page");
-
-    Integer limit = (limitFilter != null) ? Integer.parseInt(limitFilter) : 5;
-    Integer page = (pageFilter != null) ? Integer.parseInt(pageFilter) : 0;
 
     if (taskFilter != null) {
-      return this.repository.findByTaskContaining(
-        taskFilter,
-        PageRequest.of(page, limit, Sort.by(Sort.Direction.DESC, "id"))
-      );
+      return this.repository.findByTaskContaining(taskFilter, pagination);
     }
-    return this.repository.findAll(
-      PageRequest.of(page, limit, Sort.by(Sort.Direction.DESC, "id"))
-    );
+
+    return this.repository.findAll(pagination);
   }
 
   public Task save(Task task) {
@@ -75,3 +67,4 @@ public class TaskService {
     return this.save(task);
   }
 }
+
